@@ -4,15 +4,15 @@ defmodule SerialKodiRemote do
   """
 
   @doc """
-  Hello world.
+  Starts listening to a serial port.
 
   ## Examples
 
-      iex> SerialKodiRemote.hello()
-      :world
+      iex> SerialKodiRemote.start("/dev/ttyUSB0")
+      {:ok, pid}
 
   """
-  def hello do
-    :world
+  def start(port) do
+    SerialKodiRemote.Serial.start_link(port)
   end
 end
