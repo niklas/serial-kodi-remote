@@ -4,11 +4,18 @@ defmodule SerialKodiRemote.Kodi do
   alias SerialKodiRemote.KodiRPC, as: RPC
 
   def start_link(url) do
-    WebSockex.start_link(url, __MODULE__, %{}, debug: [:trace])
+    WebSockex.start_link(url, __MODULE__, %{})
+  end
+
+  def handle_frame({:text, json}, state) do
+    msg = Jason.decode!(json)
+    handle_message(msg, state)
   end
 
   def handle_frame({type, msg}, state) do
-    Logger.debug(fn -> "Received Message - Type: #{inspect(type)} -- Message: #{inspect(msg)}" end)
+    Logger.debug(fn ->
+      "Received #{inspect(type)} -- Message: #{inspect(msg)}"
+    end)
 
     {:ok, state}
   end
@@ -30,5 +37,20 @@ defmodule SerialKodiRemote.Kodi do
     else
       {:ok, state}
     end
+  end
+
+  def handle_message(%{"result" => result}, state) do
+    Logger.debug(fn -> "Received result: #{inspect(result)}" end)
+    {:ok, state}
+  end
+
+  def handle_message(%{"method" => method, "params" => params}, state) do
+    Logger.debug(fn -> "Received #{method} #{inspect(params)}" end)
+    {:ok, state}
+  end
+
+  def handle_message(msg, state) do
+    Logger.debug(fn -> "Received unhandled json: #{inspect(msg)}" end)
+    {:ok, state}
   end
 end
