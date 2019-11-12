@@ -14,7 +14,7 @@ defmodule SerialKodiRemote.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger, :websockex]
     ]
   end
 
@@ -22,6 +22,8 @@ defmodule SerialKodiRemote.MixProject do
   defp deps do
     [
       {:circuits_uart, "~> 1.3"},
+      {:websockex, "~> 0.4.2"},
+      {:jason, "~> 1.1"},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false}
     ]
   end

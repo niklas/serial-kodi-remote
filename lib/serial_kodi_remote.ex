@@ -13,7 +13,7 @@ defmodule SerialKodiRemote do
 
   """
   def start(port) do
-    {:ok, kodi} = SerialKodiRemote.Kodi.start_link([])
+    {:ok, kodi} = SerialKodiRemote.Kodi.start_link("ws://name:password@host:9090/jsonrpc")
     SerialKodiRemote.Serial.start_link(port, kodi)
   end
 end

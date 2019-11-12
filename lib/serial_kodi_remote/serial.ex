@@ -23,7 +23,7 @@ defmodule SerialKodiRemote.Serial do
     {keys, remaining} = Buffer.parse(buffer <> data)
 
     keys
-    |> Enum.map(fn key -> GenServer.cast(target, {:remote_key, key}) end)
+    |> Enum.map(fn key -> send(target, {:remote_key, key}) end)
 
     {:noreply, %{state | buffer: remaining}}
   end

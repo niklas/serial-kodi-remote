@@ -1,19 +1,44 @@
 defmodule SerialKodiRemote.Kodi do
-  use GenServer
+  use WebSockex
   require Logger
 
-  @registered_name __MODULE__
-
-  def start_link(_) do
-    GenServer.start_link(__MODULE__, %{}, name: @registered_name)
+  def start_link(url) do
+    WebSockex.start_link(url, __MODULE__, %{}, debug: [:trace])
   end
 
-  def init(state) do
+  def handle_frame({type, msg}, state) do
+    Logger.debug(fn -> "Received Message - Type: #{inspect(type)} -- Message: #{inspect(msg)}" end)
+
     {:ok, state}
   end
 
-  def handle_cast({:remote_key, key}, state) do
-    Logger.debug("Kodi: #{key}")
-    {:noreply, state}
+  def handle_info({:remote_key, key}, state) do
+    Logger.debug(fn -> "Kodi: #{key}" end)
+
+    frame =
+      case key do
+        "v" -> volume_down()
+        "V" -> volume_up()
+        _ -> nil
+      end
+
+    if frame do
+      {:reply, {:text, Jason.encode!(frame)}, state}
+    else
+      {:noreply, state}
+    end
+  end
+
+  defp volume_down do
+    %{
+      "jsonrpc" => "2.0",
+      "method" => "Application.SetVolume",
+      "params" => %{"volume" => "decrement"},
+      "id" => 1
+    }
+  end
+
+  def volume_up do
+    volume_down()
   end
 end
