@@ -39,18 +39,42 @@ defmodule SerialKodiRemote.Kodi do
     end
   end
 
-  def handle_message(%{"result" => result}, state) do
+  defp handle_message(%{"result" => result}, state) do
     Logger.debug(fn -> "Received result: #{inspect(result)}" end)
     {:ok, state}
   end
 
-  def handle_message(%{"method" => method, "params" => params}, state) do
-    Logger.debug(fn -> "Received #{method} #{inspect(params)}" end)
+  defp handle_message(%{"method" => method, "params" => params}, state) do
+    handle_method_response(method, params, state)
+  end
+
+  defp handle_message(msg, state) do
+    Logger.debug(fn -> "Received unhandled json: #{inspect(msg)}" end)
     {:ok, state}
   end
 
-  def handle_message(msg, state) do
-    Logger.debug(fn -> "Received unhandled json: #{inspect(msg)}" end)
+  defp handle_method_response("Player.OnPause", _params, state) do
+    Logger.debug(fn -> "paused" end)
+    {:ok, state}
+  end
+
+  defp handle_method_response("Player.OnResume", _params, state) do
+    Logger.debug(fn -> "unpaused" end)
+    {:ok, state}
+  end
+
+  defp handle_method_response("GUI.OnScreensaverActivated", _params, state) do
+    Logger.debug(fn -> "Screensaver activated" end)
+    {:ok, state}
+  end
+
+  defp handle_method_response("GUI.OnScreensaverDeactivated", _params, state) do
+    Logger.debug(fn -> "Screensaver deactivated" end)
+    {:ok, state}
+  end
+
+  defp handle_method_response(method, params, state) do
+    Logger.debug(fn -> "Received #{method} #{inspect(params)}" end)
     {:ok, state}
   end
 end
