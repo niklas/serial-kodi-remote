@@ -63,6 +63,24 @@ defmodule SerialKodiRemote.Kodi do
     {:ok, state}
   end
 
+  defp handle_method_response(
+         "Application.OnVolumeChanged",
+         %{"data" => %{"muted" => true}},
+         state
+       ) do
+    Logger.debug(fn -> "muted" end)
+    {:ok, state}
+  end
+
+  defp handle_method_response(
+         "Application.OnVolumeChanged",
+         %{"data" => %{"muted" => false}},
+         state
+       ) do
+    Logger.debug(fn -> "unmuted" end)
+    {:ok, state}
+  end
+
   defp handle_method_response("GUI.OnScreensaverActivated", _params, state) do
     Logger.debug(fn -> "Screensaver activated" end)
     {:ok, state}
