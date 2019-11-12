@@ -40,19 +40,19 @@ defmodule SerialKodiRemote.Delegator do
       end
 
     Kodi.send_frame(frame)
-    {:ok, state}
+    {:noreply, state}
   end
 
   # PRIVATE --------------------
 
   defp handle_kodi("Player.OnPause", _params, state) do
     Logger.debug(fn -> "paused" end)
-    {:ok, state}
+    {:noreply, state}
   end
 
   defp handle_kodi("Player.OnResume", _params, state) do
     Logger.debug(fn -> "unpaused" end)
-    {:ok, state}
+    {:noreply, state}
   end
 
   defp handle_kodi(
@@ -61,7 +61,7 @@ defmodule SerialKodiRemote.Delegator do
          state
        ) do
     Logger.debug(fn -> "muted" end)
-    {:ok, state}
+    {:noreply, state}
   end
 
   defp handle_kodi(
@@ -70,21 +70,21 @@ defmodule SerialKodiRemote.Delegator do
          state
        ) do
     Logger.debug(fn -> "unmuted" end)
-    {:ok, state}
+    {:noreply, state}
   end
 
   defp handle_kodi("GUI.OnScreensaverActivated", _params, state) do
     Logger.debug(fn -> "Screensaver activated" end)
-    {:ok, state}
+    {:noreply, state}
   end
 
   defp handle_kodi("GUI.OnScreensaverDeactivated", _params, state) do
     Logger.debug(fn -> "Screensaver deactivated" end)
-    {:ok, state}
+    {:onoreply, state}
   end
 
   defp handle_kodi(method, params, state) do
     Logger.debug(fn -> "Received #{method} #{inspect(params)}" end)
-    {:ok, state}
+    {:noreply, state}
   end
 end
