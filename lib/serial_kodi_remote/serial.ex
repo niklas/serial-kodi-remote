@@ -11,6 +11,12 @@ defmodule SerialKodiRemote.Serial do
     GenServer.start_link(__MODULE__, %{port: port, buffer: "", pid: nil}, name: @registered_name)
   end
 
+  def send_out(m) do
+    GenServer.cast(@registered_name, {:send, m})
+  end
+
+  # End of public API ----------
+
   def init(state) do
     {:ok, pid} = Circuits.UART.start_link()
     Circuits.UART.open(pid, state.port, speed: 9600, active: true)
@@ -26,5 +32,10 @@ defmodule SerialKodiRemote.Serial do
     |> Enum.map(fn key -> Delegator.from_serial({:remote_key, key}) end)
 
     {:noreply, %{state | buffer: remaining}}
+  end
+
+  def handle_cast({:send, m}, %{pid: pid} = state) do
+    :ok = Circuits.UART.write(pid, "<" <> m <> ">")
+    {:noreply, state}
   end
 end

@@ -47,11 +47,13 @@ defmodule SerialKodiRemote.Delegator do
 
   defp handle_kodi("Player.OnPause", _params, state) do
     Logger.debug(fn -> "paused" end)
+    Serial.send_out("d")
     {:noreply, state}
   end
 
   defp handle_kodi("Player.OnResume", _params, state) do
     Logger.debug(fn -> "unpaused" end)
+    Serial.send_out("D")
     {:noreply, state}
   end
 
@@ -80,7 +82,7 @@ defmodule SerialKodiRemote.Delegator do
 
   defp handle_kodi("GUI.OnScreensaverDeactivated", _params, state) do
     Logger.debug(fn -> "Screensaver deactivated" end)
-    {:onoreply, state}
+    {:noreply, state}
   end
 
   defp handle_kodi(method, params, state) do
