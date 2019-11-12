@@ -6,7 +6,8 @@ defmodule SerialKodiRemote.Kodi do
 
   @registered_name __MODULE__
 
-  def start_link(url) do
+  def start_link() do
+    url = Application.get_env(:serial_kodi_remote, :kodi_ws_url)
     WebSockex.start_link(url, __MODULE__, %{}, name: @registered_name)
   end
 

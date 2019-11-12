@@ -8,12 +8,13 @@ defmodule SerialKodiRemote do
 
   ## Examples
 
-      SerialKodiRemote.start("/dev/ttyUSB0")
+      SerialKodiRemote.start()
       {:ok, #PID}
 
   """
-  def start(port) do
-    {:ok, kodi} = SerialKodiRemote.Kodi.start_link("ws://name:password@host:9090/jsonrpc")
-    SerialKodiRemote.Serial.start_link(port, kodi)
+  def start() do
+    {:ok, _} = SerialKodiRemote.Delegator.start_link()
+    {:ok, _} = SerialKodiRemote.Kodi.start_link()
+    {:ok, _} = SerialKodiRemote.Serial.start_link()
   end
 end

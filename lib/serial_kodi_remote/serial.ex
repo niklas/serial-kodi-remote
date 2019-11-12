@@ -6,8 +6,9 @@ defmodule SerialKodiRemote.Serial do
 
   @registered_name __MODULE__
 
-  def start_link(port, target) do
-    GenServer.start_link(__MODULE__, %{port: port, buffer: "", pid: nil, target: target},
+  def start_link() do
+    port = Application.get_env(:serial_kodi_remote, :serial_port)
+    GenServer.start_link(__MODULE__, %{port: port, buffer: "", pid: nil},
       name: @registered_name
     )
   end
@@ -20,7 +21,7 @@ defmodule SerialKodiRemote.Serial do
     {:ok, %{state | pid: pid}}
   end
 
-  def handle_info({:circuits_uart, _port, data}, %{buffer: buffer, target: target} = state) do
+  def handle_info({:circuits_uart, _port, data}, %{buffer: buffer} = state) do
     {keys, remaining} = Buffer.parse(buffer <> data)
 
     keys
