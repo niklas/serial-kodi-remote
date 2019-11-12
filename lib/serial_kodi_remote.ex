@@ -13,6 +13,7 @@ defmodule SerialKodiRemote do
 
   """
   def start(port) do
-    SerialKodiRemote.Serial.start_link(port)
+    {:ok, kodi} = SerialKodiRemote.Kodi.start_link([])
+    SerialKodiRemote.Serial.start_link(port, kodi)
   end
 end
