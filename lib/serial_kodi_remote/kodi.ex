@@ -20,13 +20,15 @@ defmodule SerialKodiRemote.Kodi do
       case key do
         "v" -> RPC.volume_down()
         "V" -> RPC.volume_up()
-        _ -> nil
+        "m" -> RPC.mute()
+        "p" -> RPC.pause()
+        _ -> false
       end
 
     if frame do
       {:reply, {:text, Jason.encode!(frame)}, state}
     else
-      {:noreply, state}
+      {:ok, state}
     end
   end
 end

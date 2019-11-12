@@ -11,6 +11,14 @@ defmodule SerialKodiRemote.KodiRPC do
     command("Application.SetVolume", %{"volume" => value})
   end
 
+  def mute() do
+    command("Application.SetMute", %{"mute" => "toggle"})
+  end
+
+  def pause do
+    command("Player.PlayPause", %{"play" => "toggle", "playerid" => 1})
+  end
+
   def command(meth, params) do
     %{
       "jsonrpc" => "2.0",
