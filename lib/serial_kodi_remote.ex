@@ -8,8 +8,8 @@ defmodule SerialKodiRemote do
 
   ## Examples
 
-      iex> SerialKodiRemote.start("/dev/ttyUSB0")
-      {:ok, pid}
+      SerialKodiRemote.start("/dev/ttyUSB0")
+      {:ok, #PID}
 
   """
   def start(port) do

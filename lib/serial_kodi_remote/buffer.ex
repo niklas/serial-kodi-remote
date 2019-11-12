@@ -1,8 +1,11 @@
 defmodule SerialKodiRemote.Buffer do
-  @doc """
-  Extracts keys from a string received from Serial connections
+  @doc ~S"""
+  Extracts keys from a string received from Serial connections.
 
   ## Examples
+
+      iex> SerialKodiRemote.Buffer.parse("")
+      {[], ""}
 
       iex> SerialKodiRemote.Buffer.parse("garbage")
       {[], "garbage"}
@@ -18,14 +21,16 @@ defmodule SerialKodiRemote.Buffer do
     {[], ""}
   end
 
-  def parse(<<"rem:", key::utf8, rest::binary>>) do
+  def parse(<<"rem:", key::binary-size(1), rest::binary>>) do
     {keys, rem} = parse(rest)
 
     {[key | keys], rem}
   end
 
-  def parse(<<c::utf8, rest::binary>>) do
-    {keys, rem} = parse(rest)
-    {keys, c <> rem}
+  def parse(<<c::binary-size(1), rest::binary>>) do
+    case parse(rest) do
+      {[], rem} -> {[], c <> rem}
+      {keys, rem} -> {keys, rem}
+    end
   end
 end

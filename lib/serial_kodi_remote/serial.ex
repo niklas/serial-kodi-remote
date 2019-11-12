@@ -23,8 +23,6 @@ defmodule SerialKodiRemote.Serial do
     keys
     |> Enum.map(fn key -> Logger.debug("Received key #{key}") end)
 
-    Logger.debug("remaining: #{remaining}")
-
     {:noreply, %{state | buffer: remaining}}
   end
 end
