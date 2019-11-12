@@ -1,12 +1,11 @@
 defmodule SerialKodiRemote.Kodi do
   use WebSockex
   require Logger
-  alias SerialKodiRemote.KodiRPC, as: RPC
   alias SerialKodiRemote.Delegator
 
   @registered_name __MODULE__
 
-  def start_link() do
+  def start_link(_) do
     url = Application.get_env(:serial_kodi_remote, :kodi_ws_url)
     WebSockex.start_link(url, __MODULE__, %{}, name: @registered_name)
   end
