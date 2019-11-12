@@ -1,6 +1,7 @@
 defmodule SerialKodiRemote.Kodi do
   use WebSockex
   require Logger
+  alias SerialKodiRemote.KodiRPC, as: RPC
 
   def start_link(url) do
     WebSockex.start_link(url, __MODULE__, %{}, debug: [:trace])
@@ -17,8 +18,8 @@ defmodule SerialKodiRemote.Kodi do
 
     frame =
       case key do
-        "v" -> volume_down()
-        "V" -> volume_up()
+        "v" -> RPC.volume_down()
+        "V" -> RPC.volume_up()
         _ -> nil
       end
 
@@ -27,18 +28,5 @@ defmodule SerialKodiRemote.Kodi do
     else
       {:noreply, state}
     end
-  end
-
-  defp volume_down do
-    %{
-      "jsonrpc" => "2.0",
-      "method" => "Application.SetVolume",
-      "params" => %{"volume" => "decrement"},
-      "id" => 1
-    }
-  end
-
-  def volume_up do
-    volume_down()
   end
 end
