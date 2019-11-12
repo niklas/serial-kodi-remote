@@ -2,6 +2,7 @@ defmodule SerialKodiRemote.Serial do
   use GenServer
   require Logger
   alias SerialKodiRemote.Buffer
+  alias SerialKodiRemote.Delegator
 
   @registered_name __MODULE__
 
@@ -23,7 +24,7 @@ defmodule SerialKodiRemote.Serial do
     {keys, remaining} = Buffer.parse(buffer <> data)
 
     keys
-    |> Enum.map(fn key -> send(target, {:remote_key, key}) end)
+    |> Enum.map(fn key -> Delegator.from_serial({:remote_key, key}) end)
 
     {:noreply, %{state | buffer: remaining}}
   end
