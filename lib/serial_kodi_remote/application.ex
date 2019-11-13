@@ -6,16 +6,22 @@ defmodule SerialKodiRemote.Application do
   use Application
 
   def start(_type, _args) do
+    Supervisor.start_link(__MODULE__, [], name: __MODULE__.Supervisor)
+  end
+
+  def init(_) do
+    all = Application.get_all_env(:serial_kodi_remote)
+
     # List all child processes to be supervised
     children = [
       {SerialKodiRemote.Delegator, []},
-      {SerialKodiRemote.Kodi, []},
-      {SerialKodiRemote.Serial, []}
+      {SerialKodiRemote.Kodi, all[:kodi_ws_url]},
+      {SerialKodiRemote.Serial, all[:serial_port]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: SerialKodiRemote.Supervisor]
-    Supervisor.start_link(children, opts)
+    opts = [strategy: :one_for_one]
+    Supervisor.init(children, opts)
   end
 end

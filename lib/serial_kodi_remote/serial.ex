@@ -6,8 +6,7 @@ defmodule SerialKodiRemote.Serial do
 
   @registered_name __MODULE__
 
-  def start_link(_) do
-    port = Application.get_env(:serial_kodi_remote, :serial_port)
+  def start_link(port) do
     GenServer.start_link(__MODULE__, %{port: port, buffer: "", pid: nil}, name: @registered_name)
   end
 
