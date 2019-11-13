@@ -43,7 +43,7 @@ defmodule SerialKodiRemote.MixProject do
              transforms: []
            ]}
         ],
-        steps: [:assemble, &copy_config_file/1]
+        steps: [:assemble, &copy_config_file/1, :tar]
       ]
     ]
   end
