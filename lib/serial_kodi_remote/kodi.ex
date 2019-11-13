@@ -6,7 +6,8 @@ defmodule SerialKodiRemote.Kodi do
   @registered_name __MODULE__
 
   def start_link(url) do
-    WebSockex.start_link(url, __MODULE__, %{}, name: @registered_name)
+    Logger.debug(fn -> "#{__MODULE__} connecting to #{url}" end)
+    WebSockex.start_link(url, __MODULE__, %{url: url}, name: @registered_name)
   end
 
   def send_frame(frame) do
@@ -14,6 +15,15 @@ defmodule SerialKodiRemote.Kodi do
   end
 
   # End of public API ----------
+  def handle_connect(_conn, %{url: url} = state) do
+    Logger.info(fn -> "#{__MODULE__} connected to #{url}" end)
+    {:ok, state}
+  end
+
+  def handle_disconnect(_, %{url: url} = state) do
+    Logger.warn(fn -> "#{__MODULE__} disconnected from #{url}" end)
+    {:ok, state}
+  end
 
   def handle_frame({:text, json}, state) do
     msg = Jason.decode!(json)

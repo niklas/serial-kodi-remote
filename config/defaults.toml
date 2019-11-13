@@ -7,4 +7,4 @@ serial_port = "/dev/ttyUSB0"
 level = "debug"
 
 [logger.console]
-format = "[$level] $message \n"
+format = "$time [$level] $levelpad$message \n"
