@@ -36,6 +36,9 @@ defmodule SerialKodiRemote.Delegator do
         "V" -> RPC.volume_up()
         "m" -> RPC.mute()
         "p" -> RPC.pause()
+        "C" -> RPC.up()
+        "c" -> RPC.down()
+        "O" -> RPC.select()
         _ -> false
       end
 

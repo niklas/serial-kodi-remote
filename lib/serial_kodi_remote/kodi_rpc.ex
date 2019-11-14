@@ -19,6 +19,18 @@ defmodule SerialKodiRemote.KodiRPC do
     command("Player.PlayPause", %{"play" => "toggle", "playerid" => 1})
   end
 
+  def up do
+    command("Input.Up", [])
+  end
+
+  def down do
+    command("Input.Down", [])
+  end
+
+  def select do
+    command("Input.Select", [])
+  end
+
   def command(meth, params) do
     %{
       "jsonrpc" => "2.0",
