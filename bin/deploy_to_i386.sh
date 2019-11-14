@@ -22,3 +22,7 @@ echo "Deploying ${LATEST} to ${TARGET_HOST}:${TARGET_DIR}"
 ssh ${TARGET_HOST} mkdir -p ${TARGET_DIR}
 scp ${LATEST} ${TARGET_HOST}:/tmp/
 ssh ${TARGET_HOST} sh -c "cd ${TARGET_DIR} && tar xfz /tmp/$(basename $LATEST)"
+ssh ${TARGET_HOST} sh -c "systemctl --user stop skr; systemctl --user start skr"
+echo "waiting for the service to start"
+sleep 5
+ssh ${TARGET_HOST} systemctl --user status skr
