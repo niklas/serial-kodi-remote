@@ -39,6 +39,8 @@ defmodule SerialKodiRemote.Delegator do
         "C" -> RPC.up()
         "c" -> RPC.down()
         "O" -> RPC.select()
+        "b" -> RPC.back()
+        "i" -> RPC.info()
         _ -> false
       end
 

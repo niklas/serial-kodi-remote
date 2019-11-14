@@ -31,6 +31,14 @@ defmodule SerialKodiRemote.KodiRPC do
     command("Input.Select", [])
   end
 
+  def home do
+    command("Input.Home", [])
+  end
+
+  def info do
+    command("Input.Info", [])
+  end
+
   def command(meth, params) do
     %{
       "jsonrpc" => "2.0",
