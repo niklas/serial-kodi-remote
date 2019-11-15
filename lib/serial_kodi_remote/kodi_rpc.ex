@@ -35,6 +35,10 @@ defmodule SerialKodiRemote.KodiRPC do
     command("Input.Home", [])
   end
 
+  def back do
+    command("Input.Back", [])
+  end
+
   def info do
     command("Input.Info", [])
   end
