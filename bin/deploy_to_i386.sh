@@ -2,8 +2,8 @@
 
 set -eux
 
-TARGET_HOST=${1-:localhost}
-TARGET_DIR=${2-:~/skr}
+TARGET_HOST=${1:-localhost}
+TARGET_DIR=${2:-~/skr}
 ELIXIR_VERSION="1.9.4"
 HERE="$( cd "$(dirname "$0")" ; cd .. ; pwd -P )"
 
