@@ -21,6 +21,7 @@ defmodule SerialKodiRemote.Serial do
     :ok = Circuits.UART.open(pid, state.port, speed: 9600, active: true)
     Process.flag(:trap_exit, true)
     Logger.info(fn -> "#{__MODULE__} connected to #{state.port}" end)
+    Delegator.from_serial(:connected)
 
     {:ok, %{state | pid: pid}}
   end

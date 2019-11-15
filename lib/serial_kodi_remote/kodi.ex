@@ -48,6 +48,7 @@ defmodule SerialKodiRemote.Kodi do
 
   defp handle_message(%{"result" => result}, state) do
     Logger.debug(fn -> "Received result: #{inspect(result)}" end)
+    Delegator.from_kodi("result", result)
     {:ok, state}
   end
 

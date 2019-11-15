@@ -16,7 +16,7 @@ defmodule SerialKodiRemote.Delegator do
   end
 
   def from_serial(what) do
-    GenServer.cast(@registered_name, what)
+    GenServer.cast(@registered_name, {:from_serial, what})
   end
 
   # End of public API ----------
@@ -30,7 +30,7 @@ defmodule SerialKodiRemote.Delegator do
     handle_kodi(method, params, state)
   end
 
-  def handle_cast({:remote_key, key}, state) do
+  def handle_cast({:from_serial, {:remote_key, key}}, state) do
     frame =
       case key do
         "v" -> RPC.volume_down()
@@ -46,6 +46,11 @@ defmodule SerialKodiRemote.Delegator do
       end
 
     Kodi.send_frame(frame)
+    {:noreply, state}
+  end
+
+  def handle_cast({:from_serial, :connected}, state) do
+    Kodi.send_frame(RPC.request_player_state())
     {:noreply, state}
   end
 
@@ -79,6 +84,12 @@ defmodule SerialKodiRemote.Delegator do
     {:noreply, state}
   end
 
+  defp handle_kodi("Player.OnPlay", _params, state) do
+    Logger.debug(fn -> "playing" end)
+    Serial.send_out("D")
+    {:noreply, state}
+  end
+
   defp handle_kodi(
          "Application.OnVolumeChanged",
          %{"data" => %{"muted" => true}},
@@ -104,6 +115,18 @@ defmodule SerialKodiRemote.Delegator do
 
   defp handle_kodi("GUI.OnScreensaverDeactivated", _params, state) do
     Logger.debug(fn -> "Screensaver deactivated" end)
+    {:noreply, state}
+  end
+
+  defp handle_kodi("result", %{"speed" => 1}, state) do
+    Logger.debug(fn -> "already playing" end)
+    Serial.send_out("D")
+    {:noreply, state}
+  end
+
+  defp handle_kodi("result", %{"speed" => 0}, state) do
+    Logger.debug(fn -> "nothing is playing" end)
+    Serial.send_out("d")
     {:noreply, state}
   end
 

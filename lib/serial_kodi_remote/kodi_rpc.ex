@@ -43,6 +43,10 @@ defmodule SerialKodiRemote.KodiRPC do
     command("Input.Info", [])
   end
 
+  def request_player_state do
+    command("Player.GetProperties", %{"playerid" => 1, "properties" => ["speed"]})
+  end
+
   def command(meth, params) do
     %{
       "jsonrpc" => "2.0",
