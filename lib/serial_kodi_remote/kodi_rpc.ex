@@ -27,6 +27,14 @@ defmodule SerialKodiRemote.KodiRPC do
     command("Input.Down", [])
   end
 
+  def right do
+    command("Input.Right", [])
+  end
+
+  def left do
+    command("Input.Left", [])
+  end
+
   def select do
     command("Input.Select", [])
   end
