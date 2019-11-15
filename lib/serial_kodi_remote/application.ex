@@ -27,6 +27,7 @@ defmodule SerialKodiRemote.Application do
 
   def prep_stop(state) do
     SerialKodiRemote.Delegator.prep_stop()
+    Process.sleep(100)
     state
   end
 end

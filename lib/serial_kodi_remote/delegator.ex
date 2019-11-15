@@ -53,6 +53,7 @@ defmodule SerialKodiRemote.Delegator do
   end
 
   def handle_cast(:prep_stop, state) do
+    Logger.debug(fn -> "mark OTA" end)
     Serial.send_out("U")
     {:noreply, state}
   end
