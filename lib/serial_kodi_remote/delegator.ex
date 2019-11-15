@@ -19,6 +19,10 @@ defmodule SerialKodiRemote.Delegator do
     GenServer.cast(@registered_name, what)
   end
 
+  def prep_stop() do
+    GenServer.cast(@registered_name, :prep_stop)
+  end
+
   # End of public API ----------
 
   def init(state) do
@@ -45,6 +49,11 @@ defmodule SerialKodiRemote.Delegator do
       end
 
     Kodi.send_frame(frame)
+    {:noreply, state}
+  end
+
+  def handle_cast(:prep_stop, state) do
+    Serial.send_out("U")
     {:noreply, state}
   end
 
