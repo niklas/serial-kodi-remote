@@ -24,10 +24,4 @@ defmodule SerialKodiRemote.Application do
     opts = [strategy: :one_for_one]
     Supervisor.init(children, opts)
   end
-
-  def prep_stop(state) do
-    SerialKodiRemote.Delegator.prep_stop()
-    Process.sleep(100)
-    state
-  end
 end

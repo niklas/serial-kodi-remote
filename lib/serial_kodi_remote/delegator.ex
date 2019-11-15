@@ -19,13 +19,10 @@ defmodule SerialKodiRemote.Delegator do
     GenServer.cast(@registered_name, what)
   end
 
-  def prep_stop() do
-    GenServer.cast(@registered_name, :prep_stop)
-  end
-
   # End of public API ----------
 
   def init(state) do
+    Process.flag(:trap_exit, true)
     {:ok, state}
   end
 
@@ -53,8 +50,6 @@ defmodule SerialKodiRemote.Delegator do
   end
 
   def handle_cast(:prep_stop, state) do
-    Logger.debug(fn -> "mark OTA" end)
-    Serial.send_out("U")
     {:noreply, state}
   end
 

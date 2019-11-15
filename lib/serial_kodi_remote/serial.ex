@@ -19,6 +19,7 @@ defmodule SerialKodiRemote.Serial do
   def init(state) do
     {:ok, pid} = Circuits.UART.start_link()
     :ok = Circuits.UART.open(pid, state.port, speed: 9600, active: true)
+    Process.flag(:trap_exit, true)
     Logger.info(fn -> "#{__MODULE__} connected to #{state.port}" end)
 
     {:ok, %{state | pid: pid}}
@@ -34,7 +35,18 @@ defmodule SerialKodiRemote.Serial do
   end
 
   def handle_cast({:send, m}, %{pid: pid} = state) do
-    :ok = Circuits.UART.write(pid, "<" <> m <> ">")
+    write(pid, m)
     {:noreply, state}
+  end
+
+  def terminate(_, %{pid: pid} = state) do
+    Logger.debug(fn -> "mark OTA" end)
+    write(pid, "U")
+    Process.sleep(100)
+    state
+  end
+
+  defp write(pid, l) do
+    :ok = Circuits.UART.write(pid, "<" <> l <> ">")
   end
 end
