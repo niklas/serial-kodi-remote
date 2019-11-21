@@ -61,6 +61,12 @@ defmodule SerialKodiRemote.Delegator do
     {:noreply, state}
   end
 
+  defp handle_kodi("Player.OnStop", _params, state) do
+    Logger.debug(fn -> "stop" end)
+    Serial.send_out("d")
+    {:noreply, state}
+  end
+
   defp handle_kodi("Player.OnResume", _params, state) do
     Logger.debug(fn -> "unpaused" end)
     Serial.send_out("D")
