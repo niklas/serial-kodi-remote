@@ -9,6 +9,7 @@ TARGET_DIR="rel/docker/"
 uname -a
 echo "Building the app."
 
+[ -f config/dev.exs ] || touch config/dev.exs
 mix local.hex --force
 mix deps.get
 MIX_ENV=prod mix release
