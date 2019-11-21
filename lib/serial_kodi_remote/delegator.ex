@@ -113,11 +113,13 @@ defmodule SerialKodiRemote.Delegator do
 
   defp handle_kodi("GUI.OnScreensaverActivated", _params, state) do
     Logger.debug(fn -> "Screensaver activated" end)
+    Serial.send_out("S")
     {:noreply, state}
   end
 
   defp handle_kodi("GUI.OnScreensaverDeactivated", _params, state) do
     Logger.debug(fn -> "Screensaver deactivated" end)
+    Serial.send_out("s")
     {:noreply, state}
   end
 
