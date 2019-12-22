@@ -51,6 +51,11 @@ defmodule SerialKodiRemote.KodiRPC do
     command("Input.Info", [])
   end
 
+  def subtitle do
+    s = "next"
+    command("Player.SetSubtitle", %{"playerid" => 1, "subtitle" => s})
+  end
+
   def request_player_state do
     command("Player.GetProperties", %{"playerid" => 1, "properties" => ["speed"]})
   end
