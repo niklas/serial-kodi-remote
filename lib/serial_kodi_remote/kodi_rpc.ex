@@ -55,7 +55,7 @@ defmodule SerialKodiRemote.KodiRPC do
 
   def subtitle do
     s = "next"
-    command("Player.SetSubtitle", %{"playerid" => 1, "subtitle" => s})
+    command("Player.SetSubtitle", %{"playerid" => 1, "subtitle" => s, "enable" => true})
   end
 
   def request_player_state do
