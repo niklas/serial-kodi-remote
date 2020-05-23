@@ -74,7 +74,7 @@ defmodule SerialKodiRemote.Delegator do
         "i" ->
           RPC.info()
 
-        "s" ->
+        "t" ->
           RPC.subtitle()
 
         _ ->

@@ -63,11 +63,11 @@ defmodule SerialKodiRemote.KodiRPC do
   end
 
   def seek_left do
-    seek_seconds(-@seek_seconds)
+    command("Input.ExecuteAction", %{"action" => "stepback"})
   end
 
   def seek_right do
-    seek_seconds(@seek_seconds)
+    command("Input.ExecuteAction", %{"action" => "stepforward"})
   end
 
   defp seek_seconds(seconds) do
