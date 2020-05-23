@@ -1,4 +1,6 @@
 defmodule SerialKodiRemote.KodiRPC do
+  @seek_seconds 23
+
   def volume_down do
     volume("decrement")
   end
@@ -58,6 +60,18 @@ defmodule SerialKodiRemote.KodiRPC do
 
   def request_player_state do
     command("Player.GetProperties", %{"playerid" => 1, "properties" => ["speed"]})
+  end
+
+  def seek_left do
+    seek_seconds(-@seek_seconds)
+  end
+
+  def seek_right do
+    seek_seconds(@seek_seconds)
+  end
+
+  defp seek_seconds(seconds) do
+    command("Player.Seek", %{"playerid" => 1, "value" => %{"seconds" => seconds}})
   end
 
   def command(meth, params) do

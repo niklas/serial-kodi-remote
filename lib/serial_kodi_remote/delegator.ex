@@ -30,22 +30,55 @@ defmodule SerialKodiRemote.Delegator do
     handle_kodi(method, params, state)
   end
 
-  def handle_cast({:from_serial, {:remote_key, key}}, state) do
+  def handle_cast({:from_serial, {:remote_key, key}}, %{playing: playing} = state) do
     frame =
       case key do
-        "v" -> RPC.volume_down()
-        "V" -> RPC.volume_up()
-        "m" -> RPC.mute()
-        "p" -> RPC.pause()
-        "C" -> RPC.up()
-        "c" -> RPC.down()
-        "r" -> RPC.right()
-        "l" -> RPC.left()
-        "O" -> RPC.select()
-        "b" -> RPC.back()
-        "i" -> RPC.info()
-        "s" -> RPC.subtitle()
-        _ -> false
+        "v" ->
+          RPC.volume_down()
+
+        "V" ->
+          RPC.volume_up()
+
+        "m" ->
+          RPC.mute()
+
+        "p" ->
+          RPC.pause()
+
+        "C" ->
+          RPC.up()
+
+        "c" ->
+          RPC.down()
+
+        "r" ->
+          if playing do
+            RPC.seek_right()
+          else
+            RPC.right()
+          end
+
+        "l" ->
+          if playing do
+            RPC.seek_left()
+          else
+            RPC.left()
+          end
+
+        "O" ->
+          RPC.select()
+
+        "b" ->
+          RPC.back()
+
+        "i" ->
+          RPC.info()
+
+        "s" ->
+          RPC.subtitle()
+
+        _ ->
+          false
       end
 
     Kodi.send_frame(frame)
