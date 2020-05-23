@@ -8,7 +8,7 @@ defmodule SerialKodiRemote.Delegator do
   alias SerialKodiRemote.KodiRPC, as: RPC
 
   def start_link(_) do
-    GenServer.start_link(__MODULE__, %{playing: false}, name: @registered_name)
+    GenServer.start_link(__MODULE__, %{playing: false, subtitles: []}, name: @registered_name)
   end
 
   def from_kodi(method, params) do
@@ -75,7 +75,11 @@ defmodule SerialKodiRemote.Delegator do
           RPC.info()
 
         "t" ->
-          RPC.subtitle()
+          if Enum.empty?(state.subtitles) do
+            RPC.open_subtitle_download_dialog()
+          else
+            RPC.next_subtitle()
+          end
 
         _ ->
           false
@@ -104,6 +108,7 @@ defmodule SerialKodiRemote.Delegator do
 
   defp handle_kodi("Player.OnPlay", _params, state) do
     Logger.debug(fn -> "play" end)
+    RPC.get_subtitles() |> Kodi.send_frame()
     Serial.send_out("D")
     {:noreply, Map.replace!(state, :playing, true)}
   end
@@ -153,6 +158,7 @@ defmodule SerialKodiRemote.Delegator do
   defp handle_kodi("result", %{"speed" => 1}, state) do
     Logger.debug(fn -> "already playing" end)
     Serial.send_out("D")
+    RPC.get_subtitles() |> Kodi.send_frame()
     {:noreply, Map.replace!(state, :playing, true)}
   end
 
@@ -160,6 +166,10 @@ defmodule SerialKodiRemote.Delegator do
     Logger.debug(fn -> "nothing is playing" end)
     Serial.send_out("d")
     {:noreply, Map.replace!(state, :playing, false)}
+  end
+
+  defp handle_kodi("result", %{"subtitles" => subtitles}, state) do
+    {:noreply, Map.replace!(state, :subtitles, subtitles)}
   end
 
   defp handle_kodi(method, params, state) do
