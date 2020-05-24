@@ -52,18 +52,16 @@ defmodule SerialKodiRemote.Delegator do
           RPC.down()
 
         "r" ->
-          if playing do
-            RPC.seek_right()
-          else
-            RPC.right()
-          end
+          RPC.right()
 
         "l" ->
-          if playing do
-            RPC.seek_left()
-          else
-            RPC.left()
-          end
+          RPC.left()
+
+        "S" ->
+          RPC.seek_left()
+
+        "s" ->
+          RPC.seek_right()
 
         "O" ->
           RPC.select()
