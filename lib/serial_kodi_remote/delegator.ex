@@ -113,7 +113,7 @@ defmodule SerialKodiRemote.Delegator do
 
   defp handle_kodi("Player.OnStop", _params, state) do
     Logger.debug(fn -> "stop" end)
-    Serial.send_out("d")
+    Serial.send_out("i")
     {:noreply, Map.replace!(state, :playing, false)}
   end
 
