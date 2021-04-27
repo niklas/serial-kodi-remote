@@ -53,6 +53,10 @@ defmodule SerialKodiRemote.KodiRPC do
     command("Input.Info", [])
   end
 
+  def notify(title, message) do
+    command("GUI.ShowNotification", %{"title" => title, "message" => message})
+  end
+
   def open_subtitle_download_dialog do
     command("GUI.ActivateWindow", %{"window" => "subtitlesearch"})
   end
@@ -64,6 +68,7 @@ defmodule SerialKodiRemote.KodiRPC do
   def next_subtitle do
     s = "next"
     command("Player.SetSubtitle", %{"playerid" => 1, "subtitle" => s, "enable" => true})
+    notify("Subtitle", "selected next in line")
   end
 
   def request_player_state do
