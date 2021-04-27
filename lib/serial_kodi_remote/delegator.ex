@@ -78,9 +78,12 @@ defmodule SerialKodiRemote.Delegator do
           else
             RPC.next_subtitle()
           end
-
-        _ ->
-          false
+        o ->
+          if String.match?(o, ~r/\A\d\z/) do
+            RPC.notify("Crystal", "Color Scheme #{o}")
+          else
+            false
+          end
       end
 
     Kodi.send_frame(frame)
