@@ -33,7 +33,7 @@ defmodule SerialKodiRemote.MixProject do
 
   defp releases do
     [
-      demo: [
+      skr: [
         include_executables_for: [:unix],
         applications: [runtime_tools: :permanent],
         config_providers: [
