@@ -92,6 +92,7 @@ defmodule SerialKodiRemote.Delegator do
 
   def handle_cast({:from_serial, :connected}, state) do
     Kodi.send_frame(RPC.request_player_state())
+    Kodi.send_frame(RPC.notify("Remote Control", "connected"))
     {:noreply, state}
   end
 
