@@ -5,6 +5,7 @@ defmodule SerialKodiRemote.Serial do
   alias SerialKodiRemote.Delegator
 
   @registered_name __MODULE__
+  @baud 115200
 
   def start_link(port) do
     GenServer.start_link(__MODULE__, %{port: port, buffer: "", pid: nil}, name: @registered_name)
@@ -18,7 +19,7 @@ defmodule SerialKodiRemote.Serial do
 
   def init(state) do
     {:ok, pid} = Circuits.UART.start_link()
-    :ok = Circuits.UART.open(pid, state.port, speed: 19200, active: true)
+    :ok = Circuits.UART.open(pid, state.port, speed: @baud, active: true)
     Process.flag(:trap_exit, true)
     Logger.info(fn -> "#{__MODULE__} connected to #{state.port}" end)
     Delegator.from_serial(:connected)
