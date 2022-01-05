@@ -6,6 +6,7 @@ defmodule SerialKodiRemote.Serial do
 
   @registered_name __MODULE__
   @baud 115200
+  @wait 5 * 1000
 
   def start_link(port) do
     GenServer.start_link(__MODULE__, %{port: port, buffer: "", pid: nil}, name: @registered_name)
@@ -19,12 +20,21 @@ defmodule SerialKodiRemote.Serial do
 
   def init(state) do
     {:ok, pid} = Circuits.UART.start_link()
-    :ok = Circuits.UART.open(pid, state.port, speed: @baud, active: true)
     Process.flag(:trap_exit, true)
-    Logger.info(fn -> "#{__MODULE__} connected to #{state.port}" end)
-    Delegator.from_serial(:connected)
+    schedule_connect()
 
     {:ok, %{state | pid: pid}}
+  end
+
+  def handle_info(:connect, state) do
+    case connect(state.pid, state.port) do
+      :ok ->
+        :ok
+      {:error, reason} ->
+        Logger.warn(fn -> "#{__MODULE__} cannot connect: #{reason}" end)
+        schedule_connect()
+    end
+    {:noreply, state}
   end
 
   def handle_info({:circuits_uart, _port, data}, %{buffer: buffer} = state) do
@@ -50,5 +60,20 @@ defmodule SerialKodiRemote.Serial do
 
   defp write(pid, l) do
     :ok = Circuits.UART.write(pid, "<" <> l <> ">")
+  end
+
+  defp schedule_connect() do
+    Process.send_after(self(), :connect, @wait)
+  end
+
+  defp connect(pid, port) do
+    case Circuits.UART.open(pid, port, speed: @baud, active: true) do
+      :ok ->
+        Logger.info(fn -> "#{__MODULE__} connected to #{port}" end)
+        Delegator.from_serial(:connected)
+        :ok
+      other ->
+        other
+    end
   end
 end
