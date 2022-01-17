@@ -21,6 +21,10 @@ defmodule SerialKodiRemote.KodiRPC do
     command("Player.PlayPause", %{"play" => "toggle", "playerid" => 1})
   end
 
+  def stop do
+    command("Player.Stop", %{"playerid" => 1})
+  end
+
   def up do
     command("Input.Up", [])
   end

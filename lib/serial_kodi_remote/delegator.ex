@@ -45,6 +45,9 @@ defmodule SerialKodiRemote.Delegator do
         "p" ->
           RPC.pause()
 
+        "P" ->
+          RPC.stop()
+
         "C" ->
           RPC.up()
 
