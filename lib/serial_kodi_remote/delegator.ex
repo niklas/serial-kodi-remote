@@ -75,6 +75,12 @@ defmodule SerialKodiRemote.Delegator do
         "i" ->
           RPC.info()
 
+        "n" ->
+          RPC.next_item()
+
+        "N" ->
+          RPC.previous_item()
+
         "t" ->
           if Enum.empty?(state.subtitles) do
             RPC.open_subtitle_download_dialog()

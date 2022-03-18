@@ -87,6 +87,14 @@ defmodule SerialKodiRemote.KodiRPC do
     command("Input.ExecuteAction", %{"action" => "stepforward"})
   end
 
+  def next_item do
+    command("Player.GoTo", %{"playerid" => 1, "to" => "next"})
+  end
+
+  def previous_item do
+    command("Player.GoTo", %{"playerid" => 1, "to" => "previous"})
+  end
+
   defp seek_seconds(seconds) do
     command("Player.Seek", %{"playerid" => 1, "value" => %{"seconds" => seconds}})
   end
