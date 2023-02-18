@@ -12,5 +12,5 @@ RUN --mount=type=tmpfs,target=./_build
 RUN mix do deps.get, compile
 RUN mix release ${app_name} \
     && mv _build/${build_env}/rel/${app_name} /opt/release \
-    && mv /opt/release/bin/${app_name} /opt/release/bin/start_server
-CMD /opt/release/bin/start_server
+    && mv /opt/release/bin/${app_name} /opt/release/bin/server
+CMD /opt/release/bin/server start
