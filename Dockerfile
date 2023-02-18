@@ -8,6 +8,7 @@ RUN apk update \
     && mix local.rebar --force \
     && mix local.hex --force
 COPY . .
+RUN --mount=type=tmpfs,target=./deps
 RUN --mount=type=tmpfs,target=./_build
 RUN mix do deps.get, compile
 RUN mix release ${app_name} \
