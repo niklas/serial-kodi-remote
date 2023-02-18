@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+set -eu
+
+DOCKER_BUILDKIT=1 docker build -t niklasho/serial-kodi-remote .
