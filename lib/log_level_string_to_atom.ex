@@ -9,4 +9,6 @@ defmodule LogLevelStringToAtom do
   def transform(:level, "notice"), do: :notice
   def transform(:level, "info"), do: :info
   def transform(:level, "debug"), do: :debug
+  def transform(:level, _), do: :info
+  def transform(_, v), do: v
 end
