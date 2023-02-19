@@ -2,5 +2,8 @@
 kodi_ws_url = "ws://login:password@host:9090/jsonrpc"
 serial_port = "/dev/ttyUSB0"
 
+[logger]
+level = "debug"
+
 [logger.console]
 format = "$time [$level] $message \n"
