@@ -2,5 +2,8 @@
 
 set -eu
 
-docker run --privileged --rm tonistiigi/binfmt --install aarch64
-docker buildx build --platform linux/aarch64 -t niklasho/serial-kodi-remote:latest --push .
+ARCH=aarch64
+TAG=setup-001
+
+docker run --privileged --rm tonistiigi/binfmt --install ${ARCH}
+docker buildx build --platform linux/${ARCH} -t niklasho/serial-kodi-remote:${TAG} --push .
