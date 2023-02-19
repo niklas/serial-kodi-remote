@@ -30,6 +30,14 @@ defmodule SerialKodiRemote.Serial do
     case connect(state.pid, state.port) do
       :ok ->
         :ok
+      {:error, :enoent} ->
+        Logger.warn(fn -> "#{__MODULE__} cannot connect: device #{state.port} does not exist" end)
+        Process.sleep(@wait * 10)
+        schedule_connect()
+      {:error, :eperm} ->
+        Logger.warn(fn -> "#{__MODULE__} cannot connect: no permissions to write to device #{state.port}" end)
+        Process.sleep(@wait * 10)
+        schedule_connect()
       {:error, reason} ->
         Logger.warn(fn -> "#{__MODULE__} cannot connect: #{reason}" end)
         schedule_connect()
