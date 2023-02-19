@@ -40,7 +40,7 @@ defmodule SerialKodiRemote.MixProject do
           {Toml.Provider,
            [
              path: {:system, "HOME", "/.serial_kodi_remote/skr.toml"},
-             transforms: []
+             transforms: [LogLevelStringToAtom]
            ]}
         ],
         steps: [:assemble, &copy_config_file/1, :tar]
