@@ -3,7 +3,7 @@
 set -eu
 
 ARCH=aarch64
-TAG=setup-001
+TAG=latest
 
 docker run --privileged --rm tonistiigi/binfmt --install ${ARCH}
 docker buildx build --platform linux/${ARCH} -t niklasho/serial-kodi-remote:${TAG} --push .
