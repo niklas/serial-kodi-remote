@@ -39,7 +39,7 @@ defmodule SerialKodiRemote.MixProject do
         config_providers: [
           {Toml.Provider,
            [
-             path: {:system, "HOME", "/.serial_kodi_remote.toml"},
+             path: {:system, "HOME", "/.serial_kodi_remote/skr.toml"},
              transforms: []
            ]}
         ],
