@@ -24,3 +24,4 @@ serial_kodi_remote-*.tar
 
 config/dev.exs
 /rel/docker/*.gz
+/config/skr.toml
