@@ -4,7 +4,7 @@ set -eux
 
 TARGET_HOST=${1:-localhost}
 TARGET_DIR=${2:-~/skr}
-ELIXIR_VERSION="1.9.4"
+ELIXIR_VERSION="latest"
 HERE="$( cd "$(dirname "$0")" ; cd .. ; pwd -P )"
 
 echo "Building in ${HERE}"
@@ -12,6 +12,7 @@ echo "Building in ${HERE}"
 docker run -it --rm -h elixir.local \
        -v ${HERE}:/src \
        --mount type=tmpfs,destination=/src/_build \
+       --mount type=tmpfs,destination=/src/deps \
        -w /src \
        i386/elixir:${ELIXIR_VERSION} ./bin/build.sh
 
