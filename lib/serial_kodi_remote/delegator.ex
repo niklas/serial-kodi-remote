@@ -5,7 +5,7 @@ defmodule SerialKodiRemote.Delegator do
 
   alias SerialKodiRemote.Kodi
   alias SerialKodiRemote.Serial
-  alias SerialKodiRemote.KodiRPC, as: RPC
+  alias SerialKodiRemote.KodiRPC
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %{playing: false, subtitles: []}, name: @registered_name)
@@ -30,78 +30,16 @@ defmodule SerialKodiRemote.Delegator do
     handle_kodi(method, params, state)
   end
 
-  def handle_cast({:from_serial, {:remote_key, key}}, %{playing: playing} = state) do
-    frame =
-      case key do
-        "v" ->
-          RPC.volume_down()
+  def handle_cast({:from_serial, {:remote_key, key}}, state) do
+    handle_remote_key(key, state)
+    |> Kodi.send_frame()
 
-        "V" ->
-          RPC.volume_up()
-
-        "m" ->
-          RPC.mute()
-
-        "p" ->
-          RPC.pause()
-
-        "P" ->
-          RPC.stop()
-
-        "C" ->
-          RPC.up()
-
-        "c" ->
-          RPC.down()
-
-        "r" ->
-          RPC.right()
-
-        "l" ->
-          RPC.left()
-
-        "S" ->
-          RPC.seek_left()
-
-        "s" ->
-          RPC.seek_right()
-
-        "O" ->
-          RPC.select()
-
-        "b" ->
-          RPC.back()
-
-        "i" ->
-          RPC.info()
-
-        "n" ->
-          RPC.next_item()
-
-        "N" ->
-          RPC.previous_item()
-
-        "t" ->
-          if Enum.empty?(state.subtitles) do
-            RPC.open_subtitle_download_dialog()
-          else
-            RPC.next_subtitle()
-          end
-        o ->
-          if String.match?(o, ~r/\A\d\z/) do
-            RPC.notify("Crystal", "Color Scheme #{o}")
-          else
-            false
-          end
-      end
-
-    Kodi.send_frame(frame)
     {:noreply, state}
   end
 
   def handle_cast({:from_serial, :connected}, state) do
-    Kodi.send_frame(RPC.request_player_state())
-    Kodi.send_frame(RPC.notify("Remote Control", "connected"))
+    Kodi.send_frame(KodiRPC.request_player_state())
+    Kodi.send_frame(KodiRPC.notify("Remote Control", "connected"))
     {:noreply, state}
   end
 
@@ -111,6 +49,72 @@ defmodule SerialKodiRemote.Delegator do
 
   # PRIVATE --------------------
 
+  defp handle_remote_key(key, state) do
+    case key do
+      "v" ->
+        KodiRPC.volume_down()
+
+      "V" ->
+        KodiRPC.volume_up()
+
+      "m" ->
+        KodiRPC.mute()
+
+      "p" ->
+        KodiRPC.pause()
+
+      "P" ->
+        KodiRPC.stop()
+
+      "C" ->
+        KodiRPC.up()
+
+      "c" ->
+        KodiRPC.down()
+
+      "r" ->
+        KodiRPC.right()
+
+      "l" ->
+        KodiRPC.left()
+
+      "S" ->
+        KodiRPC.seek_left()
+
+      "s" ->
+        KodiRPC.seek_right()
+
+      "O" ->
+        KodiRPC.select()
+
+      "b" ->
+        KodiRPC.back()
+
+      "i" ->
+        KodiRPC.info()
+
+      "n" ->
+        KodiRPC.next_item()
+
+      "N" ->
+        KodiRPC.previous_item()
+
+      "t" ->
+        if Enum.empty?(state.subtitles) do
+          KodiRPC.open_subtitle_download_dialog()
+        else
+          KodiRPC.next_subtitle()
+        end
+
+      o ->
+        if String.match?(o, ~r/\A\d\z/) do
+          KodiRPC.notify("Crystal", "Color Scheme #{o}")
+        else
+          false
+        end
+    end
+  end
+
   defp handle_kodi("Player.OnPause", _params, state) do
     Logger.debug(fn -> "paused" end)
     Serial.send_out("d")
@@ -119,7 +123,7 @@ defmodule SerialKodiRemote.Delegator do
 
   defp handle_kodi("Player.OnPlay", _params, state) do
     Logger.debug(fn -> "play" end)
-    RPC.get_subtitles() |> Kodi.send_frame()
+    KodiRPC.get_subtitles() |> Kodi.send_frame()
     Serial.send_out("D")
     {:noreply, Map.replace!(state, :playing, true)}
   end
@@ -169,7 +173,7 @@ defmodule SerialKodiRemote.Delegator do
   defp handle_kodi("result", %{"speed" => 1}, state) do
     Logger.debug(fn -> "already playing" end)
     Serial.send_out("D")
-    RPC.get_subtitles() |> Kodi.send_frame()
+    KodiRPC.get_subtitles() |> Kodi.send_frame()
     {:noreply, Map.replace!(state, :playing, true)}
   end
 
