@@ -93,6 +93,7 @@ defmodule SerialKodiRemote.KodiRPC do
     command("Player.GoTo", %{"playerid" => 1, "to" => "previous"})
   end
 
+  # jumps to a fixed position. UNUSED.
   defp seek_seconds(seconds) do
     command("Player.Seek", %{"playerid" => 1, "value" => %{"seconds" => seconds}})
   end
