@@ -21,7 +21,7 @@ defmodule SerialKodiRemote.Kodi do
   end
 
   def handle_disconnect(_, %{url: url} = state) do
-    Logger.warn(fn -> "#{__MODULE__} disconnected from #{url}" end)
+    Logger.warning(fn -> "#{__MODULE__} disconnected from #{url}" end)
     {:ok, state}
   end
 
