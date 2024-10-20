@@ -1,6 +1,4 @@
 defmodule SerialKodiRemote.KodiRPC do
-  @seek_seconds 23
-
   def volume_down do
     volume("decrement")
   end
