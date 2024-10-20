@@ -5,7 +5,7 @@ defmodule SerialKodiRemote.Serial do
   alias SerialKodiRemote.Delegator
 
   @registered_name __MODULE__
-  @baud 115200
+  @baud 115_200
   @wait 5 * 1000
 
   def start_link(port) do
@@ -90,6 +90,7 @@ defmodule SerialKodiRemote.Serial do
         Logger.info(fn -> "#{__MODULE__} connected to #{port}" end)
         Delegator.from_serial(:connected)
         :ok
+
       other ->
         other
     end
