@@ -6,7 +6,11 @@ defmodule SerialKodiRemote.RetryWorker do
   @max_delay 30_000
 
   def start_link({mod, args}) do
-    GenServer.start_link(__MODULE__, {mod, args, @initial_delay})
+    GenServer.start_link(
+      __MODULE__,
+      {mod, args, @initial_delay},
+      name: Module.concat(mod, RetryWorker)
+    )
   end
 
   def init({mod, args, delay}) do
