@@ -22,6 +22,6 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 serial_kodi_remote-*.tar
 
-config/dev.exs
+.env
 /rel/docker/*.gz
 /config/skr.toml

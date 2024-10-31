@@ -2,4 +2,5 @@
 
 set -eu
 
+[ -e .env ] && source .env
 iex -S mix
