@@ -77,7 +77,14 @@ defmodule SerialKodiRemote.Serial do
   end
 
   defp write(pid, l) do
-    :ok = Circuits.UART.write(pid, "<" <> l <> ">")
+    case Circuits.UART.write(pid, "<" <> l <> ">") do
+      :ok ->
+        :ok
+
+      {:error, :ebadf} ->
+        Logger.warning(fn -> "#{__MODULE__} writing failed: Bad file descriptor" end)
+        :ok
+    end
   end
 
   defp schedule_connect() do
