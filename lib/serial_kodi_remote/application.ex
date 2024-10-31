@@ -14,9 +14,10 @@ defmodule SerialKodiRemote.Application do
 
     # List all child processes to be supervised
     children = [
+      {SerialKodiRemote.DynamicSupervisor, []},
       {SerialKodiRemote.Delegator, []},
-      {SerialKodiRemote.Kodi, all[:kodi_ws_url]},
-      {SerialKodiRemote.Serial, all[:serial_port]}
+      {SerialKodiRemote.RetryWorker, {SerialKodiRemote.Kodi, all[:kodi_ws_url]}},
+      {SerialKodiRemote.RetryWorker, {SerialKodiRemote.Serial, all[:serial_port]}}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
