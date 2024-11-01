@@ -137,25 +137,27 @@ defmodule SerialKodiRemote.Delegator do
     {:noreply, state}
   end
 
-  defp handle_kodi("result", %{"speed" => 1}, state) do
+  defp handle_kodi("result", data, state), do: handle_kodi_result(data, state)
+
+  defp handle_kodi(method, params, state) do
+    Logger.debug(fn -> "Received #{method} #{inspect(params)}" end)
+    {:noreply, state}
+  end
+
+  defp handle_kodi_result(%{"speed" => 1}, state) do
     Logger.debug(fn -> "already playing" end)
     Serial.send_out("D")
     KodiRPC.get_subtitles() |> Kodi.send_frame()
     {:noreply, Map.replace!(state, :playing, true)}
   end
 
-  defp handle_kodi("result", %{"speed" => 0}, state) do
+  defp handle_kodi_result(%{"speed" => 0}, state) do
     Logger.debug(fn -> "nothing is playing" end)
     Serial.send_out("d")
     {:noreply, Map.replace!(state, :playing, false)}
   end
 
-  defp handle_kodi("result", %{"subtitles" => subtitles}, state) do
+  defp handle_kodi_result(%{"subtitles" => subtitles}, state) do
     {:noreply, Map.replace!(state, :subtitles, subtitles)}
-  end
-
-  defp handle_kodi(method, params, state) do
-    Logger.debug(fn -> "Received #{method} #{inspect(params)}" end)
-    {:noreply, state}
   end
 end
