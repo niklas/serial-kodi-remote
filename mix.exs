@@ -27,6 +27,7 @@ defmodule SerialKodiRemote.MixProject do
       {:websockex, "~> 0.4.2"},
       {:jason, "~> 1.1"},
       {:toml, "~> 0.6.1"},
+      {:httpoison, "~> 2.2.1"},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false}
     ]
   end

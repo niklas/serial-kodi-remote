@@ -16,6 +16,7 @@ defmodule SerialKodiRemote.Application do
     children = [
       {SerialKodiRemote.DynamicSupervisor, []},
       {SerialKodiRemote.Delegator, []},
+      {SerialKodiRemote.RetryWorker, {SerialKodiRemote.Transmission, all[:transmission_rpc_url]}},
       {SerialKodiRemote.RetryWorker, {SerialKodiRemote.Kodi, all[:kodi_ws_url]}},
       {SerialKodiRemote.RetryWorker, {SerialKodiRemote.Serial, all[:serial_port]}}
     ]
