@@ -1,4 +1,6 @@
 defmodule SerialKodiRemote.KodiRPC do
+  @compile {:nowarn_unused_function, [seek_seconds: 1]}
+
   def volume_down do
     volume("decrement")
   end
@@ -94,7 +96,7 @@ defmodule SerialKodiRemote.KodiRPC do
   end
 
   # jumps to a fixed position. UNUSED.
-  defp seek_seconds(seconds) do
+  def seek_seconds(seconds) do
     command("Player.Seek", %{"playerid" => 1, "value" => %{"seconds" => seconds}})
   end
 
