@@ -49,69 +49,36 @@ defmodule SerialKodiRemote.Delegator do
 
   # PRIVATE --------------------
 
-  defp handle_remote_key(key, state) do
-    case key do
-      "v" ->
-        KodiRPC.volume_down()
+  defp handle_remote_key("v", _state), do: KodiRPC.volume_down()
+  defp handle_remote_key("V", _state), do: KodiRPC.volume_up()
+  defp handle_remote_key("m", _state), do: KodiRPC.mute()
+  defp handle_remote_key("p", _state), do: KodiRPC.pause()
+  defp handle_remote_key("P", _state), do: KodiRPC.stop()
+  defp handle_remote_key("C", _state), do: KodiRPC.up()
+  defp handle_remote_key("c", _state), do: KodiRPC.down()
+  defp handle_remote_key("r", _state), do: KodiRPC.right()
+  defp handle_remote_key("l", _state), do: KodiRPC.left()
+  defp handle_remote_key("S", _state), do: KodiRPC.seek_left()
+  defp handle_remote_key("s", _state), do: KodiRPC.seek_right()
+  defp handle_remote_key("O", _state), do: KodiRPC.select()
+  defp handle_remote_key("b", _state), do: KodiRPC.back()
+  defp handle_remote_key("i", _state), do: KodiRPC.info()
+  defp handle_remote_key("n", _state), do: KodiRPC.next_item()
+  defp handle_remote_key("N", _state), do: KodiRPC.previous_item()
 
-      "V" ->
-        KodiRPC.volume_up()
+  defp handle_remote_key("t", state) do
+    if Enum.empty?(state.subtitles) do
+      KodiRPC.open_subtitle_download_dialog()
+    else
+      KodiRPC.next_subtitle()
+    end
+  end
 
-      "m" ->
-        KodiRPC.mute()
-
-      "p" ->
-        KodiRPC.pause()
-
-      "P" ->
-        KodiRPC.stop()
-
-      "C" ->
-        KodiRPC.up()
-
-      "c" ->
-        KodiRPC.down()
-
-      "r" ->
-        KodiRPC.right()
-
-      "l" ->
-        KodiRPC.left()
-
-      "S" ->
-        KodiRPC.seek_left()
-
-      "s" ->
-        KodiRPC.seek_right()
-
-      "O" ->
-        KodiRPC.select()
-
-      "b" ->
-        KodiRPC.back()
-
-      "i" ->
-        KodiRPC.info()
-
-      "n" ->
-        KodiRPC.next_item()
-
-      "N" ->
-        KodiRPC.previous_item()
-
-      "t" ->
-        if Enum.empty?(state.subtitles) do
-          KodiRPC.open_subtitle_download_dialog()
-        else
-          KodiRPC.next_subtitle()
-        end
-
-      o ->
-        if String.match?(o, ~r/\A\d\z/) do
-          KodiRPC.notify("Crystal", "Color Scheme #{o}")
-        else
-          false
-        end
+  defp handle_remote_key(key, _state) do
+    if String.match?(key, ~r/\A\d\z/) do
+      KodiRPC.notify("Crystal", "Color Scheme #{key}")
+    else
+      false
     end
   end
 
