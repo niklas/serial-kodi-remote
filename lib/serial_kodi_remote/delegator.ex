@@ -6,6 +6,7 @@ defmodule SerialKodiRemote.Delegator do
   alias SerialKodiRemote.Kodi
   alias SerialKodiRemote.Serial
   alias SerialKodiRemote.KodiRPC
+  alias SerialKodiRemote.Transmission
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %{playing: false, subtitles: []}, name: @registered_name)
@@ -128,12 +129,14 @@ defmodule SerialKodiRemote.Delegator do
   defp handle_kodi("GUI.OnScreensaverActivated", _params, state) do
     Logger.debug(fn -> "Screensaver activated" end)
     Serial.send_out("S")
+    Transmission.disable_slow_mode()
     {:noreply, state}
   end
 
   defp handle_kodi("GUI.OnScreensaverDeactivated", _params, state) do
     Logger.debug(fn -> "Screensaver deactivated" end)
     Serial.send_out("s")
+    Transmission.enable_slow_mode()
     {:noreply, state}
   end
 
