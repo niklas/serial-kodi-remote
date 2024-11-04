@@ -3,6 +3,7 @@ defmodule SerialKodiRemote.Transmission do
   require Logger
 
   @registered_name __MODULE__
+  @auth_header "X-Transmission-Session-Id"
 
   def start_link(url) do
     GenServer.start_link(__MODULE__, url, name: @registered_name)
@@ -34,7 +35,7 @@ defmodule SerialKodiRemote.Transmission do
       })
 
     headers = [
-      "X-Transmission-Session-Id": session_id
+      "#{@auth_header}": session_id
     ]
 
     last_result =
@@ -48,9 +49,21 @@ defmodule SerialKodiRemote.Transmission do
           {:error, "unauthorized"}
 
         {:ok, %{status_code: 409, headers: headers}} ->
-          [new_session_id] = for {"x-transmission-session-id", id} <- headers, do: id
-          Logger.debug(fn -> "#{__MODULE__}: Conflict, retrying with new session id" end)
-          do_rpc({meth, args}, Map.put(state, :session_id, new_session_id))
+          headers = Enum.into(headers, %{})
+
+          # sometimes, hackney makes the headers downcased, so we try both variants
+          case Map.get(headers, @auth_header) || Map.get(headers, String.downcase(@auth_header)) do
+            nil ->
+              Logger.warning(fn ->
+                "#{__MODULE__}: Conflict, but could not find a new session id"
+              end)
+
+              {:error, "conflict, no new sesion id"}
+
+            new_session_id ->
+              Logger.debug(fn -> "#{__MODULE__}: Conflict, retrying with new session id" end)
+              do_rpc({meth, args}, Map.put(state, :session_id, new_session_id))
+          end
 
         {:ok, %{status_code: 301, headers: headers}} ->
           [location] = for {"location", l} <- headers, do: l

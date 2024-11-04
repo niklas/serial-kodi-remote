@@ -147,6 +147,10 @@ defmodule SerialKodiRemote.Delegator do
     {:noreply, state}
   end
 
+  defp handle_kodi_result("OK", state) do
+    {:noreply, state}
+  end
+
   defp handle_kodi_result(%{"speed" => 1}, state) do
     Logger.debug(fn -> "already playing" end)
     Serial.send_out("D")
@@ -162,5 +166,10 @@ defmodule SerialKodiRemote.Delegator do
 
   defp handle_kodi_result(%{"subtitles" => subtitles}, state) do
     {:noreply, Map.replace!(state, :subtitles, subtitles)}
+  end
+
+  defp handle_kodi_result(result, state) do
+    Logger.debug(fn -> "unhandleds result from kodi: #{inspect(result)}" end)
+    {:noreply, state}
   end
 end
