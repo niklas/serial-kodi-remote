@@ -20,9 +20,11 @@ defmodule SerialKodiRemote.Kodi do
     {:ok, state}
   end
 
-  def handle_disconnect(_, %{url: url} = state) do
-    Logger.warning(fn -> "#{__MODULE__} disconnected from #{url}" end)
-    {:ok, state}
+  # TODO: crash on disconnect so RetryWorker can do his thing?
+  def handle_disconnect(%{reason: reason, attempt_number: num}, %{url: url} = state) do
+    Logger.warning(fn -> "#{__MODULE__} disconnected from #{url} #{inspect(reason)}" end)
+    :timer.sleep(2 ** min(11, num))
+    {:reconnect, state}
   end
 
   def handle_frame({:text, json}, state) do

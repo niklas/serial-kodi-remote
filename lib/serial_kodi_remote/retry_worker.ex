@@ -27,6 +27,7 @@ defmodule SerialKodiRemote.RetryWorker do
   defp try_start(mod, args, delay) do
     case DynamicSupervisor.start_child(SerialKodiRemote.DynamicSupervisor, {mod, args}) do
       {:ok, _pid} ->
+        # TODO: reset delay?
         :ok
 
       {:error, reason} ->
