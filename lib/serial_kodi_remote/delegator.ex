@@ -1,6 +1,6 @@
 defmodule SerialKodiRemote.Delegator do
   use GenServer
-  require Logger
+  use SerialKodiRemote.TaggedLogger
   @registered_name __MODULE__
 
   alias SerialKodiRemote.Kodi
@@ -84,26 +84,26 @@ defmodule SerialKodiRemote.Delegator do
   end
 
   defp handle_kodi("Player.OnPause", _params, state) do
-    Logger.debug(fn -> "paused" end)
+    log_debug(fn -> "paused" end)
     Serial.send_out("d")
     {:noreply, Map.replace!(state, :playing, true)}
   end
 
   defp handle_kodi("Player.OnPlay", _params, state) do
-    Logger.debug(fn -> "play" end)
+    log_debug(fn -> "play" end)
     KodiRPC.get_subtitles() |> Kodi.send_frame()
     Serial.send_out("D")
     {:noreply, Map.replace!(state, :playing, true)}
   end
 
   defp handle_kodi("Player.OnStop", _params, state) do
-    Logger.debug(fn -> "stop" end)
+    log_debug(fn -> "stop" end)
     Serial.send_out("i")
     {:noreply, Map.replace!(state, :playing, false)}
   end
 
   defp handle_kodi("Player.OnResume", _params, state) do
-    Logger.debug(fn -> "unpaused" end)
+    log_debug(fn -> "unpaused" end)
     Serial.send_out("D")
     {:noreply, Map.replace!(state, :playing, true)}
   end
@@ -113,7 +113,7 @@ defmodule SerialKodiRemote.Delegator do
          %{"data" => %{"muted" => true}},
          state
        ) do
-    Logger.debug(fn -> "muted" end)
+    log_debug(fn -> "muted" end)
     {:noreply, state}
   end
 
@@ -122,19 +122,19 @@ defmodule SerialKodiRemote.Delegator do
          %{"data" => %{"muted" => false}},
          state
        ) do
-    Logger.debug(fn -> "unmuted" end)
+    log_debug(fn -> "unmuted" end)
     {:noreply, state}
   end
 
   defp handle_kodi("GUI.OnScreensaverActivated", _params, state) do
-    Logger.debug(fn -> "Screensaver activated" end)
+    log_debug(fn -> "Screensaver activated" end)
     Serial.send_out("S")
     Transmission.disable_slow_mode()
     {:noreply, state}
   end
 
   defp handle_kodi("GUI.OnScreensaverDeactivated", _params, state) do
-    Logger.debug(fn -> "Screensaver deactivated" end)
+    log_debug(fn -> "Screensaver deactivated" end)
     Serial.send_out("s")
     Transmission.enable_slow_mode()
     {:noreply, state}
@@ -143,7 +143,7 @@ defmodule SerialKodiRemote.Delegator do
   defp handle_kodi("result", data, state), do: handle_kodi_result(data, state)
 
   defp handle_kodi(method, params, state) do
-    Logger.debug(fn -> "Received #{method} #{inspect(params)}" end)
+    log_debug(fn -> "Received #{method} #{inspect(params)}" end)
     {:noreply, state}
   end
 
@@ -152,14 +152,14 @@ defmodule SerialKodiRemote.Delegator do
   end
 
   defp handle_kodi_result(%{"speed" => 1}, state) do
-    Logger.debug(fn -> "already playing" end)
+    log_debug(fn -> "already playing" end)
     Serial.send_out("D")
     KodiRPC.get_subtitles() |> Kodi.send_frame()
     {:noreply, Map.replace!(state, :playing, true)}
   end
 
   defp handle_kodi_result(%{"speed" => 0}, state) do
-    Logger.debug(fn -> "nothing is playing" end)
+    log_debug(fn -> "nothing is playing" end)
     Serial.send_out("d")
     {:noreply, Map.replace!(state, :playing, false)}
   end
@@ -169,7 +169,7 @@ defmodule SerialKodiRemote.Delegator do
   end
 
   defp handle_kodi_result(result, state) do
-    Logger.debug(fn -> "unhandleds result from kodi: #{inspect(result)}" end)
+    log_debug(fn -> "unhandleds result from kodi: #{inspect(result)}" end)
     {:noreply, state}
   end
 end

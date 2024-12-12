@@ -1,6 +1,6 @@
 defmodule SerialKodiRemote.RetryWorker do
   use GenServer
-  require Logger
+  use SerialKodiRemote.TaggedLogger
 
   @initial_delay 1000
   @max_delay 30_000
@@ -28,11 +28,12 @@ defmodule SerialKodiRemote.RetryWorker do
     case DynamicSupervisor.start_child(SerialKodiRemote.DynamicSupervisor, {mod, args}) do
       {:ok, _pid} ->
         # TODO: reset delay?
+        log_info(fn -> "started #{mod} successfully" end)
         :ok
 
       {:error, reason} ->
-        Logger.warning(fn ->
-          "RetryWorker: failed #{mod}\n  with: #{inspect(reason)}\n  restarting in #{delay}ms"
+        log_warning(fn ->
+          "failed #{mod}\n  with: #{inspect(reason)}\n  restarting in #{delay}ms"
         end)
 
         # Retry with updated delay

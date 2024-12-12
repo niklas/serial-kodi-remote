@@ -1,6 +1,6 @@
 defmodule SerialKodiRemote.Serial do
   use GenServer
-  require Logger
+  use SerialKodiRemote.TaggedLogger
   alias SerialKodiRemote.Buffer
   alias SerialKodiRemote.Delegator
 
@@ -32,23 +32,23 @@ defmodule SerialKodiRemote.Serial do
         :ok
 
       {:error, :enoent} ->
-        Logger.warning(fn ->
-          "#{__MODULE__} cannot connect: device #{state.port} does not exist"
+        log_warning(fn ->
+          "cannot connect: device #{state.port} does not exist"
         end)
 
         Process.sleep(@wait * 10)
         schedule_connect()
 
       {:error, :eperm} ->
-        Logger.warning(fn ->
-          "#{__MODULE__} cannot connect: no permissions to write to device #{state.port}"
+        log_warning(fn ->
+          "no permissions to write to device #{state.port}"
         end)
 
         Process.sleep(@wait * 10)
         schedule_connect()
 
       {:error, reason} ->
-        Logger.warning(fn -> "#{__MODULE__} cannot connect: #{reason}" end)
+        log_warning(fn -> "cannot connect: #{reason}" end)
         schedule_connect()
     end
 
@@ -70,7 +70,7 @@ defmodule SerialKodiRemote.Serial do
   end
 
   def terminate(_, %{pid: pid} = state) do
-    Logger.debug(fn -> "mark OTA" end)
+    log_debug(fn -> "mark OTA" end)
     write(pid, "U")
     Process.sleep(100)
     state
@@ -82,7 +82,7 @@ defmodule SerialKodiRemote.Serial do
         :ok
 
       {:error, :ebadf} ->
-        Logger.warning(fn -> "#{__MODULE__} writing failed: Bad file descriptor" end)
+        log_warning(fn -> "writing failed: Bad file descriptor" end)
         :ok
     end
   end
@@ -94,7 +94,7 @@ defmodule SerialKodiRemote.Serial do
   defp connect(pid, port) do
     case Circuits.UART.open(pid, port, speed: @baud, active: true) do
       :ok ->
-        Logger.info(fn -> "#{__MODULE__} connected to #{port}" end)
+        log_info(fn -> "connected to #{port}" end)
         Delegator.from_serial(:connected)
         :ok
 

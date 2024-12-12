@@ -1,6 +1,6 @@
 defmodule SerialKodiRemote.Transmission do
   use GenServer
-  require Logger
+  use SerialKodiRemote.TaggedLogger
 
   @registered_name __MODULE__
   @auth_header "X-Transmission-Session-Id"
@@ -45,7 +45,7 @@ defmodule SerialKodiRemote.Transmission do
           :ok
 
         {:ok, %{status_code: 401}} ->
-          Logger.warning(fn -> "#{__MODULE__}: Unauthorized" end)
+          log_warning(fn -> "Unauthorized" end)
           {:error, "unauthorized"}
 
         {:ok, %{status_code: 409, headers: headers}} ->
@@ -54,20 +54,20 @@ defmodule SerialKodiRemote.Transmission do
           # sometimes, hackney makes the headers downcased, so we try both variants
           case Map.get(headers, @auth_header) || Map.get(headers, String.downcase(@auth_header)) do
             nil ->
-              Logger.warning(fn ->
-                "#{__MODULE__}: Conflict, but could not find a new session id"
+              log_warning(fn ->
+                "Conflict, but could not find a new session id"
               end)
 
               {:error, "conflict, no new sesion id"}
 
             new_session_id ->
-              Logger.debug(fn -> "#{__MODULE__}: Conflict, retrying with new session id" end)
+              log_debug(fn -> "Conflict, retrying with new session id" end)
               do_rpc({meth, args}, Map.put(state, :session_id, new_session_id))
           end
 
         {:ok, %{status_code: 301, headers: headers}} ->
           [location] = for {"location", l} <- headers, do: l
-          Logger.warning(fn -> "#{__MODULE__}: Redirect to #{location}" end)
+          log_warning(fn -> "Redirect to #{location}" end)
           {:error, "redirected to #{location}"}
       end
 
