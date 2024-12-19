@@ -24,6 +24,8 @@ config :serial_kodi_remote,
   kodi_ws_url: "ws://login:password@kodihost:9090/jsonrpc",
   serial_port: "/dev/ttyUSB0"
 
+config :logger, :console, format: "$time [$level] $message \n"
+
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment
 # by uncommenting the line below and defining dev.exs, test.exs and such.
