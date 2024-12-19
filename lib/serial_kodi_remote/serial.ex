@@ -6,7 +6,6 @@ defmodule SerialKodiRemote.Serial do
 
   @registered_name __MODULE__
   @baud 115_200
-  @wait 5 * 1000
 
   def start_link(port) do
     GenServer.start_link(__MODULE__, %{port: port, buffer: "", pid: nil}, name: @registered_name)
@@ -20,39 +19,33 @@ defmodule SerialKodiRemote.Serial do
 
   def init(state) do
     {:ok, pid} = Circuits.UART.start_link()
-    Process.flag(:trap_exit, true)
-    schedule_connect()
 
-    {:ok, %{state | pid: pid}}
+    {:ok, do_connect(%{state | pid: pid})}
   end
 
-  def handle_info(:connect, state) do
-    case connect(state.pid, state.port) do
+  def do_connect(%{pid: pid, port: port} = state) do
+    case connect(pid, port) do
       :ok ->
-        :ok
+        state
 
       {:error, :enoent} ->
         log_warning(fn ->
           "cannot connect: device #{state.port} does not exist"
         end)
 
-        Process.sleep(@wait * 10)
-        schedule_connect()
+        exit(:unavailable)
 
       {:error, :eperm} ->
         log_warning(fn ->
           "no permissions to write to device #{state.port}"
         end)
 
-        Process.sleep(@wait * 10)
-        schedule_connect()
+        exit(:unavailable)
 
       {:error, reason} ->
         log_warning(fn -> "cannot connect: #{reason}" end)
-        schedule_connect()
+        exit(:error)
     end
-
-    {:noreply, state}
   end
 
   def handle_info({:circuits_uart, _port, data}, %{buffer: buffer} = state) do
@@ -85,10 +78,6 @@ defmodule SerialKodiRemote.Serial do
         log_warning(fn -> "writing failed: Bad file descriptor" end)
         :ok
     end
-  end
-
-  defp schedule_connect() do
-    Process.send_after(self(), :connect, @wait)
   end
 
   defp connect(pid, port) do

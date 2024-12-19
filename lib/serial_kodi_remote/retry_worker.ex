@@ -44,6 +44,10 @@ defmodule SerialKodiRemote.RetryWorker do
         log_warning(fn -> "already started" end, name)
         state
 
+      {:error, :unavailable} ->
+        schedule_retry(state.delay, name)
+        state
+
       {:error, reason} ->
         log_warning(
           fn ->
