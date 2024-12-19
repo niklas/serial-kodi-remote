@@ -14,7 +14,6 @@ defmodule SerialKodiRemote.Application do
 
     # List all child processes to be supervised
     children = [
-      {SerialKodiRemote.DynamicSupervisor, []},
       {SerialKodiRemote.Delegator, []},
       {SerialKodiRemote.RetryWorker, {SerialKodiRemote.Transmission, all[:transmission_rpc_url]}},
       {SerialKodiRemote.RetryWorker, {SerialKodiRemote.Kodi, all[:kodi_ws_url]}},

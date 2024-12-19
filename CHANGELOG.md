@@ -1,3 +1,7 @@
+# v5
+
+* avoid DynamicSuperVisor and let our RetryWorker trap exits
+
 # v4
 
 * add time to log messages

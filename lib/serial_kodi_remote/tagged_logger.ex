@@ -3,16 +3,16 @@ defmodule SerialKodiRemote.TaggedLogger do
     quote do
       require Logger
 
-      def log_info(msgfn) do
-        Logger.info(fn -> "#{__MODULE__}: #{msgfn.()}" end)
+      def log_info(msgfn, name \\ __MODULE__) do
+        Logger.info(fn -> "#{name}: #{msgfn.()}" end)
       end
 
-      def log_warning(msgfn) do
-        Logger.warning(fn -> "#{__MODULE__}: #{msgfn.()}" end)
+      def log_warning(msgfn, name \\ __MODULE__) do
+        Logger.warning(fn -> "#{name}: #{msgfn.()}" end)
       end
 
-      def log_debug(msgfn) do
-        Logger.debug(fn -> "#{__MODULE__}: #{msgfn.()}" end)
+      def log_debug(msgfn, name \\ __MODULE__) do
+        Logger.debug(fn -> "#{name}: #{msgfn.()}" end)
       end
     end
   end
