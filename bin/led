@@ -1,0 +1,151 @@
+#!/usr/bin/env ruby
+
+module Logging
+  def log(msg)
+    $stderr.puts msg
+  end
+end
+
+class GPIO
+  include Logging
+  attr_reader :pin
+  def initialize(pin)
+    @pin = pin
+  end
+
+  def ensure_output
+    make_acccessible unless File.exist?(direction_file)
+    set_as_output unless File.exists?(value_file)
+  end
+
+  def direction_file
+    @direction_file ||= "/sys/class/gpio/gpio#{pin}/direction"
+  end
+
+  def value_file
+    @value_file ||= "/sys/class/gpio/gpio#{pin}/value"
+  end
+
+  def make_acccessible
+    log "Make pin #{pin} accessible"
+    write_into('/sys/class/gpio/export', pin.to_s)
+  end
+
+  def set_as_output
+    log "Define pin #{pin} as output"
+    write_into(direction_file, 'out')
+  end
+
+  def set(value)
+    log "Set pin #{pin} to #{value}"
+    write_into(value_file, value.to_s)
+  end
+
+  def write_into(file, string)
+    File.open(file, 'w') do |f|
+      f.write string 
+    end
+  end
+end
+
+class LED
+  include Logging
+  CHIP = "gpiochip0"
+
+  def initialize
+    @r = GPIO.new(17)
+    @g = GPIO.new(27)
+    @b = GPIO.new(23)
+    @all = [@r,@g,@b]
+  end
+
+  # We use gpioset directly because the sys interface throws Permission Denied even for root
+  def set(r, g, b)
+    log "Set: #{r},#{g},#{b}"
+    sets = @all.zip([r,g,b]).map do |led,val|
+      "#{led.pin}=#{val.to_i}"
+    end
+    system("gpioset", CHIP, *sets)
+  end
+
+  def on; set(1,1,1); end
+
+  def off; set(0,0,0); end
+
+  def white; on(); end
+  def black; off(); end
+  def red; set(1,0,0); end
+  def green; set(0,1,0); end
+  def blue; set(0,0,1); end
+  def yellow; set(1,1,0); end
+  def purple; set(1,0,1); end
+  def turquoise; set(0,1,1); end
+
+  def ensure_output
+    @all.each(&:ensure_output)
+  end
+end
+
+class Kubernetes
+  def broken_deployments
+    output = %x~
+      sudo kubectl get deployments --all-namespaces -o jsonpath='{range .items[*]}{.metadata.namespace}{"\\t"}{.metadata.name}{"\\t"}{.status.readyReplicas}{"\\t"}{.spec.replicas}{"\\n"}{end}' | awk -F '\\t' '$3 != $4 {print $2}'
+    ~
+    output.lines.map(&:chomp)
+  end
+end
+
+Colors = %w(
+  red
+  green
+  blue
+  white
+  black
+  yellow
+  purple
+  turquoise
+)
+
+if $0 == __FILE__ 
+  led = LED.new
+  include Logging
+  case cmd = ARGV.shift
+  when 'set'
+    col = ARGV.shift
+    if Colors.include?(col)
+      led.public_send(col)
+    else
+      log "unknown color: #{col}"
+    end
+  when 'on'
+    led.on()
+  when 'off'
+    led.off()
+  when 'test'
+    led.red()
+    sleep 1
+    led.blue()
+    sleep 1
+    led.green()
+    sleep 1
+    led.off()
+  when 'test2'
+    led.yellow()
+    sleep 1
+    led.purple()
+    sleep 1
+    led.turquoise()
+    sleep 1
+    led.off()
+  when 'status'
+    led.yellow()
+    kub = Kubernetes.new
+    if kub.broken_deployments.length > 0
+      led.red()
+    else
+      led.green()
+    end
+  else
+    log "Unknown command: #{cmd}, please use one of: test, test2, set <color>, on, off"
+  end
+end
