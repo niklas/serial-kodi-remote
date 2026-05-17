@@ -18,13 +18,23 @@ defmodule SerialKodiRemoteWeb.StatusLive do
 
   def part(assigns) do
     ~H"""
-     <div class="flex flex-col gap-2">
+     <div class={["flex flex-col gap-2 p-4 border rounded", border_color(@resource.status)]}>
        <h2 class="text-xl font-bold">{@title}</h2>
-       <span>{@resource.status}</span>
+       <span class={text_color(@resource.status)}>{@resource.status}</span>
        <p>{@resource.message}</p>
     </div>
     """
   end
+
+  defp border_color(:connected), do: "border-green-500"
+  defp border_color(:unavailable), do: "border-red-500"
+  defp border_color(:starting), do: "border-yellow-500"
+  defp border_color(_), do: "border-gray-500"
+
+  defp text_color(:connected), do: "text-green-500"
+  defp text_color(:unavailable), do: "text-red-500"
+  defp text_color(:starting), do: "text-yellow-500"
+  defp text_color(_), do: "text-gray-500"
 
   def mount(_params, _session, socket) do
     {:ok,
