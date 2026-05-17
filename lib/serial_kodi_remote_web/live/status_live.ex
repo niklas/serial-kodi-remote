@@ -7,10 +7,10 @@ defmodule SerialKodiRemoteWeb.StatusLive do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={%{}}>
-      <div class="flex flex-col gap-4">
-        <div class="w-full">
-          <.part title="Serial" resource={@serial} />
-        </div>
+      <div class="flex flex-row gap-4">
+        <.part class="w-full" title="Serial" resource={@serial} />
+        <.part class="w-full" title="Transmission" resource={@transmission} />
+        <.part class="w-full" title="Kodi" resource={@kodi} />
       </div>
     </Layouts.app>
     """
@@ -18,10 +18,10 @@ defmodule SerialKodiRemoteWeb.StatusLive do
 
   def part(assigns) do
     ~H"""
-     <div class={["flex flex-col gap-2 p-4 border rounded", border_color(@resource.status)]}>
+     <div class={[@class, "flex flex-col gap-2 p-4 border rounded", border_color(@resource.status)]}>
        <h2 class="text-xl font-bold">{@title}</h2>
        <span class={text_color(@resource.status)}>{@resource.status}</span>
-       <p>{@resource.message}</p>
+       <p class="text-sm">{@resource.message}</p>
     </div>
     """
   end
@@ -40,11 +40,17 @@ defmodule SerialKodiRemoteWeb.StatusLive do
     {:ok,
      socket
      |> assign(:serial, init_serial())
+     |> assign(:kodi, init_kodi())
+     |> assign(:transmission, init_transmission())
     }
   end
 
-  def handle_info({:serial, msg}, socket) do
-    handle_serial(msg, socket)
+  def handle_info({resource, {status, msg}}, socket) do
+    {:noreply, assign(socket, resource, %{status: status, message: msg})}
+  end
+
+  def handle_info({resource, status}, socket) when is_atom(status) do
+    {:noreply, assign(socket, resource, %{status: status, message: nil})}
   end
 
   defp init_serial() do
@@ -55,12 +61,20 @@ defmodule SerialKodiRemoteWeb.StatusLive do
      message: message
     }
   end
-
-  defp handle_serial({:unavailable, msg}, socket) do
-    {:noreply, assign(socket, :serial, %{status: :unavailable, message: msg})}
+  defp init_kodi() do
+    {status, message} = RetryWorker.status(SerialKodiRemote.Kodi)
+    %{
+      subscription: Broadcaster.subscribe(:kodi),
+      status: status,
+      message: message
+    }
   end
-
-  defp handle_serial(:connected, socket) do
-    {:noreply, assign(socket, :serial, %{status: :connected, message: nil})}
+  defp init_transmission() do
+    {status, message} = RetryWorker.status(SerialKodiRemote.Transmission)
+    %{
+     subscription: Broadcaster.subscribe(:transmission),
+     status: status,
+     message: message
+    }
   end
 end

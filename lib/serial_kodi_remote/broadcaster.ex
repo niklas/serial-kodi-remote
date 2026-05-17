@@ -6,6 +6,12 @@ defmodule SerialKodiRemote.Broadcaster do
   def subscribe(:serial) do
     PubSub.subscribe(SKR, "serial")
   end
+  def subscribe(:transmission) do
+    PubSub.subscribe(SKR, "transmission")
+  end
+  def subscribe(:kodi) do
+    PubSub.subscribe(SKR, "kodi")
+  end
 
   def serial(msg) do
     broadcast("serial", msg)
