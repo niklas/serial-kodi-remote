@@ -1,4 +1,4 @@
-FROM elixir:1.17.3-otp-27-alpine
+FROM elixir:1.19.5-otp-28-alpine
 ARG app_name=skr
 ARG build_env=prod
 ENV MIX_ENV=${build_env} TERM=xterm

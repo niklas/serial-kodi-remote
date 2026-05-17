@@ -3,4 +3,4 @@
 set -eu
 
 [ -e .env ] && source .env
-iex -S mix
+iex -S mix phx.server

@@ -5,24 +5,34 @@ defmodule SerialKodiRemote.Application do
 
   use Application
 
+  @impl true
   def start(_type, _args) do
-    Supervisor.start_link(__MODULE__, [], name: __MODULE__.Supervisor)
-  end
-
-  def init(_) do
     all = Application.get_all_env(:serial_kodi_remote)
-
-    # List all child processes to be supervised
     children = [
       {SerialKodiRemote.Delegator, []},
       {SerialKodiRemote.RetryWorker, {SerialKodiRemote.Transmission, all[:transmission_rpc_url]}},
       {SerialKodiRemote.RetryWorker, {SerialKodiRemote.Kodi, all[:kodi_ws_url]}},
-      {SerialKodiRemote.RetryWorker, {SerialKodiRemote.Serial, all[:serial_port]}}
+      {SerialKodiRemote.RetryWorker, {SerialKodiRemote.Serial, all[:serial_port]}},
+      SerialKodiRemoteWeb.Telemetry,
+      {DNSCluster, query: Application.get_env(:serial_kodi_remote, :dns_cluster_query) || :ignore},
+      {Phoenix.PubSub, name: SerialKodiRemote.PubSub},
+      # Start a worker by calling: SerialKodiRemote.Worker.start_link(arg)
+      # {SerialKodiRemote.Worker, arg},
+      # Start to serve requests, typically the last entry
+      SerialKodiRemoteWeb.Endpoint
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one]
-    Supervisor.init(children, opts)
+    opts = [strategy: :one_for_one, name: SerialKodiRemote.Supervisor]
+    Supervisor.start_link(children, opts)
+  end
+
+  # Tell Phoenix to update the endpoint configuration
+  # whenever the application is updated.
+  @impl true
+  def config_change(changed, _new, removed) do
+    SerialKodiRemoteWeb.Endpoint.config_change(changed, removed)
+    :ok
   end
 end
