@@ -17,7 +17,7 @@ defmodule SerialKodiRemoteWeb.Router do
   scope "/", SerialKodiRemoteWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", StatusLive
   end
 
   # Other scopes may use custom stacks.
