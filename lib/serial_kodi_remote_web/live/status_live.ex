@@ -1,17 +1,42 @@
 defmodule SerialKodiRemoteWeb.StatusLive do
   use SerialKodiRemoteWeb, :live_view
 
+  alias SerialKodiRemote.Broadcaster
+
   def render(assigns) do
     ~H"""
     <Layouts.app flash={%{}}>
       <div class="flex flex-col gap-4">
-        hohoihoi
+        <div class="w-full">
+          <.part title="Serial" resource={@serial} />
+        </div>
       </div>
     </Layouts.app>
     """
   end
 
+  def part(assigns) do
+    ~H"""
+     <div class="flex flex-col gap-2">
+       <h2 class="text-xl font-bold">{@title}</h2>
+       <span>{@resource.status}</span>
+       <p>{@resource.message}</p>
+    </div>
+    """
+  end
+
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    {:ok,
+     socket
+     |> assign(:serial, init_serial())
+    }
+  end
+
+  defp init_serial() do
+    %{
+     subscription: Broadcaster.subscribe(:serial),
+     status: :unknown,
+     message: nil
+    }
   end
 end

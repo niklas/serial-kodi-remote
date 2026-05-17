@@ -3,6 +3,7 @@ defmodule SerialKodiRemote.Serial do
   use SerialKodiRemote.TaggedLogger
   alias SerialKodiRemote.Buffer
   alias SerialKodiRemote.Delegator
+  alias SerialKodiRemote.Broadcaster
 
   @registered_name __MODULE__
   @baud 115_200
@@ -26,12 +27,14 @@ defmodule SerialKodiRemote.Serial do
   def do_connect(%{pid: pid, port: port} = state) do
     case connect(pid, port) do
       :ok ->
+        Broadcaster.serial_connected()
         state
 
       {:error, :enoent} ->
         log_warning(fn ->
           "cannot connect: device #{state.port} does not exist"
         end)
+        Broadcaster.serial_problem("device #{state.port} does not exist")
 
         exit(:unavailable)
 
@@ -39,11 +42,13 @@ defmodule SerialKodiRemote.Serial do
         log_warning(fn ->
           "no permissions to write to device #{state.port}"
         end)
+        Broadcaster.serial_problem("no permissions to write to device #{state.port}")
 
         exit(:unavailable)
 
       {:error, reason} ->
         log_warning(fn -> "cannot connect: #{reason}" end)
+        Broadcaster.serial_problem("cannot connect: #{reason}")
         exit(:error)
     end
   end
