@@ -8,7 +8,7 @@ defmodule SerialKodiRemote.Broadcaster do
   end
 
   def serial(msg) do
-    broadcast("serial", msg)
+    broadcast("serial", {:serial, msg})
   end
 
   def serial_problem(msg) do

@@ -32,11 +32,23 @@ defmodule SerialKodiRemoteWeb.StatusLive do
     }
   end
 
+  def handle_info({:serial, msg}, socket) do
+    handle_serial(msg, socket)
+  end
+
   defp init_serial() do
     %{
      subscription: Broadcaster.subscribe(:serial),
      status: :unknown,
      message: nil
     }
+  end
+
+  defp handle_serial({:problem, msg}, socket) do
+    {:noreply, assign(socket, :serial, %{status: :problem, message: msg})}
+  end
+
+  defp handle_serial(:connected, socket) do
+    {:noreply, assign(socket, :serial, %{status: :connected, message: nil})}
   end
 end
