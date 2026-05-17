@@ -2,6 +2,7 @@ defmodule SerialKodiRemoteWeb.StatusLive do
   use SerialKodiRemoteWeb, :live_view
 
   alias SerialKodiRemote.Broadcaster
+  alias SerialKodiRemote.RetryWorker
 
   def render(assigns) do
     ~H"""
@@ -37,15 +38,16 @@ defmodule SerialKodiRemoteWeb.StatusLive do
   end
 
   defp init_serial() do
+    {status, message} = RetryWorker.status(SerialKodiRemote.Serial)
     %{
      subscription: Broadcaster.subscribe(:serial),
-     status: :unknown,
-     message: nil
+     status: status,
+     message: message
     }
   end
 
-  defp handle_serial({:problem, msg}, socket) do
-    {:noreply, assign(socket, :serial, %{status: :problem, message: msg})}
+  defp handle_serial({:unavailable, msg}, socket) do
+    {:noreply, assign(socket, :serial, %{status: :unavailable, message: msg})}
   end
 
   defp handle_serial(:connected, socket) do

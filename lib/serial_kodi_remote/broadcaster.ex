@@ -8,18 +8,10 @@ defmodule SerialKodiRemote.Broadcaster do
   end
 
   def serial(msg) do
-    broadcast("serial", {:serial, msg})
+    broadcast("serial", msg)
   end
 
-  def serial_problem(msg) do
-    serial({:problem, msg})
-  end
-
-  def serial_connected() do
-    serial(:connected)
-  end
-
-  defp broadcast(topic, message) do
+  def broadcast(topic, message) do
     PubSub.broadcast(SKR, topic, message)
   end
 end

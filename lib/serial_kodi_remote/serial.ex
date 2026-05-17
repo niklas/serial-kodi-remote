@@ -27,29 +27,25 @@ defmodule SerialKodiRemote.Serial do
   def do_connect(%{pid: pid, port: port} = state) do
     case connect(pid, port) do
       :ok ->
-        Broadcaster.serial_connected()
+        Broadcaster.serial(:connected)
         state
 
       {:error, :enoent} ->
         log_warning(fn ->
           "cannot connect: device #{state.port} does not exist"
         end)
-        Broadcaster.serial_problem("device #{state.port} does not exist")
-
-        exit(:unavailable)
+        exit({:unavailable, "device #{state.port} does not exist"})
 
       {:error, :eperm} ->
         log_warning(fn ->
           "no permissions to write to device #{state.port}"
         end)
-        Broadcaster.serial_problem("no permissions to write to device #{state.port}")
 
-        exit(:unavailable)
+        exit({:unavailable, "no permissions to write to device #{state.port}"})
 
       {:error, reason} ->
         log_warning(fn -> "cannot connect: #{reason}" end)
-        Broadcaster.serial_problem("cannot connect: #{reason}")
-        exit(:error)
+        exit({:unavailable, "cannot connect: #{reason}"})
     end
   end
 

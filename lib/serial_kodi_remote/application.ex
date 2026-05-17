@@ -11,9 +11,9 @@ defmodule SerialKodiRemote.Application do
     children = [
       {Phoenix.PubSub, name: SerialKodiRemote.PubSub},
       {SerialKodiRemote.Delegator, []},
-      {SerialKodiRemote.RetryWorker, {SerialKodiRemote.Transmission, all[:transmission_rpc_url]}},
-      {SerialKodiRemote.RetryWorker, {SerialKodiRemote.Kodi, all[:kodi_ws_url]}},
-      {SerialKodiRemote.RetryWorker, {SerialKodiRemote.Serial, all[:serial_port]}},
+      {SerialKodiRemote.RetryWorker, {SerialKodiRemote.Transmission, :transmission, all[:transmission_rpc_url]}},
+      {SerialKodiRemote.RetryWorker, {SerialKodiRemote.Kodi, :kodi, all[:kodi_ws_url]}},
+      {SerialKodiRemote.RetryWorker, {SerialKodiRemote.Serial, :serial, all[:serial_port]}},
       SerialKodiRemoteWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:serial_kodi_remote, :dns_cluster_query) || :ignore},
       # Start a worker by calling: SerialKodiRemote.Worker.start_link(arg)
